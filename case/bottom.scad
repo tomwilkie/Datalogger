@@ -4,8 +4,8 @@ usb_height=8;
 usb_width=11;
 usb_offset=19;
 
-pwr_switch_opening_height=12;
-pwr_switch_opening_width=7;
+pwr_switch_opening_height=12.5;
+pwr_switch_opening_width=6.5;
 pwr_switch_mounting_holes=28;
 cone_width = standoff_id + (2 * 2.25 * ((wall_thickness / 2) - 1.5) / 1.5);
 
@@ -63,13 +63,13 @@ module bottom() {
 
 		// add holes for connectors
 		translate([external_width + wall_thickness - connector_depth_b,
-				connector_1_y, connector_or + 2 * wall_thickness + connector_padding])
+				connector_1_y, connector_or + 2 * wall_thickness + connector_padding / 2])
 			connector_hole();
 		translate([external_width + wall_thickness - connector_depth_b,
-				connector_2_y, connector_or + 2 * wall_thickness + connector_padding])
+				connector_2_y, connector_or + 2 * wall_thickness + connector_padding / 2])
 			connector_hole();
 		translate([external_width + wall_thickness - connector_depth_b,
-				external_depth / 2, height - connector_or - wall_thickness - connector_padding])
+				external_depth / 2, height - connector_or - wall_thickness - connector_padding / 2])
 			connector_hole();
 
 		// add holes for lid standoffs
@@ -88,23 +88,23 @@ module bottom() {
 			cube([2 * wall_thickness, usb_width, usb_height]);
 
 		// add a cutout for the pwr switch
-		translate([-wall_thickness/2, external_width / 2, wall_thickness/2 + (height - pwr_switch_opening_height) / 2])
-			cube([2 * wall_thickness, pwr_switch_opening_width, pwr_switch_opening_height]);
-		translate([-wall_thickness/2, (external_width + pwr_switch_opening_width) / 2, 
-				 wall_thickness/2 + (height - pwr_switch_mounting_holes) / 2])
-			rotate([0,90,0])	union() {
-				sylinder(2 * wall_thickness, standoff_id, standoff_id);
-				sylinder(wall_thickness, cone_width, standoff_id);
-			}
-		translate([-wall_thickness/2, (external_width + pwr_switch_opening_width) / 2, 
-				 wall_thickness/2 + (height + pwr_switch_mounting_holes) / 2])
-			rotate([0,90,0])	union() {
-				sylinder(2 * wall_thickness, standoff_id, standoff_id);
-				sylinder(wall_thickness, cone_width, standoff_id);
-			}
+		translate([-wall_thickness/2, external_depth / 4, (height + wall_thickness) / 2]) union() {
+			translate([0, -pwr_switch_opening_width / 2, - pwr_switch_opening_height / 2])
+				cube([2 * wall_thickness, pwr_switch_opening_width, pwr_switch_opening_height]);
+			translate([0, 0, pwr_switch_mounting_holes / 2])
+				rotate([0,90,0]) union() {
+					sylinder(2 * wall_thickness, standoff_id, standoff_id);
+					//sylinder(wall_thickness, cone_width, standoff_id);
+				}
+			translate([0, 0, -pwr_switch_mounting_holes / 2])
+				rotate([0,90,0]) union() {
+					sylinder(2 * wall_thickness, standoff_id, standoff_id);
+					//sylinder(wall_thickness, cone_width, standoff_id);
+				}
+		}
 
 		// add a cutout for power/status led
-		translate([-wall_thickness/2, 3 * external_width / 8, (wall_thickness + height)/2])
+		translate([-wall_thickness/2, external_depth / 2, (wall_thickness + height)/2])
 			rotate([0,90,0])
 				sylinder(2* wall_thickness, led_od, led_od);
 	}

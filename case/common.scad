@@ -11,16 +11,17 @@ standoff_od = standoff_id + wall_thickness;
 
 arduino_padding = 1;
 arduino_x = (2 * standoff_od) + arduino_padding;
-arduino_y = wall_thickness + arduino_padding;
+arduino_y = (2 * standoff_od) + arduino_padding;
 arduino_width = 101.6;
 arduino_depth = 53.3;
 
 internal_width = arduino_width + (2 * arduino_padding) + (4 * standoff_od) - (2 * wall_thickness);
-internal_depth = arduino_depth + (2 * arduino_padding);
+internal_depth = arduino_depth + (2 * arduino_padding) + (4 * standoff_od) - (2 * wall_thickness);
 
 outer_corner_radius = standoff_od;
 
 connector_or = 15.5/2;
+connector_key = 15;
 connector_or_b = 19/2;
 connector_depth_b=wall_thickness/2;
 
@@ -68,9 +69,14 @@ module sylinder(height, rad) {
 }
 
 module connector_hole() {
-	rotate([0,-90,0])
-		union() {
-			sylinder(wall_thickness * 2, connector_or, connector_or);
-			sylinder(wall_thickness, connector_or_b, connector_or_b);
+	union() {
+		difference() {
+			rotate([0,-90,0]) 
+				sylinder(wall_thickness * 2, connector_or, connector_or);
+			translate([-5*wall_thickness/2, -connector_or, connector_or-connector_key-wall_thickness])
+				cube([wall_thickness * 3, connector_or * 2, wall_thickness]);
 		}
+		rotate([0,-90,0]) 
+			sylinder(wall_thickness, connector_or_b, connector_or_b);
+	}
 }
