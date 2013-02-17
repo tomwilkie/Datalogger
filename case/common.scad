@@ -2,22 +2,30 @@ include <MCAD/boxes.scad>;
 include <MCAD/nuts_and_bolts.scad>;
 include <battery.scad>;
 
-internal_width = 120;
-internal_depth = 120;
-wall_thickness = 4;
+wall_thickness = 2;
 height = 45;
-outer_corner_radius = 10;
-arduino_x = wall_thickness + 10;
-arduino_y = wall_thickness + 3.35;
-standoff_height = 10;
+
+standoff_height = 5;
 standoff_id = 3.5/2;
-standoff_od = 7.5/2;
+standoff_od = standoff_id + wall_thickness;
+
+arduino_padding = 1;
+arduino_x = (2 * standoff_od) + arduino_padding;
+arduino_y = wall_thickness + arduino_padding;
+arduino_width = 101.6;
+arduino_depth = 53.3;
+
+internal_width = arduino_width + (2 * arduino_padding) + (4 * standoff_od) - (2 * wall_thickness);
+internal_depth = arduino_depth + (2 * arduino_padding);
+
+outer_corner_radius = standoff_od;
+
 connector_or = 15.5/2;
 connector_or_b = 19/2;
-connector_depth_b=2.25;
+connector_depth_b=wall_thickness/2;
 
-external_width = internal_width + 2 * wall_thickness;
-external_depth = internal_depth + 2 * wall_thickness;
+external_width = internal_width + (2 * wall_thickness);
+external_depth = internal_depth + (2 * wall_thickness);
 
 arduino_standoffs = [
   [14.0, 2.5],
@@ -29,20 +37,23 @@ arduino_standoffs = [
 ];
 
 lid_standoffs = [
-	[standoff_od * 2, standoff_od * 2],
-	[standoff_od * 2, external_depth - (standoff_od * 2)],
-	[external_width - (standoff_od * 2), standoff_od * 2],
-	[external_width - (standoff_od * 2), external_depth - (standoff_od * 2)],
+	[standoff_od, standoff_od],
+	[standoff_od, external_depth - (standoff_od)],
+	[external_width - (standoff_od), standoff_od],
+	[external_width - (standoff_od), external_depth - (standoff_od)],
+
+	[(external_width - standoff_od) / 2, standoff_od],
+	[(external_width - standoff_od) / 2, external_depth - (standoff_od)],
 ];
 
 module standoff(x) {
 	translate([arduino_x, arduino_y, 0] + x)
-		cylinder(standoff_height, standoff_od, standoff_od);
+		sylinder(standoff_height, standoff_od, standoff_od);
 }
 
 module standoff_hole(x) {
 	translate([arduino_x, arduino_y, -2.5] + x)
-			cylinder(standoff_height + 5, 
+			sylinder(standoff_height + 5, 
 				standoff_id, standoff_id);
 }
 
@@ -52,10 +63,14 @@ module standoff_nut(x) {
 			nutHole(3);
 }
 
+module sylinder(height, rad) {
+        cylinder(height, rad, rad, $fn=100);
+}
+
 module connector_hole() {
 	rotate([0,-90,0])
 		union() {
-			cylinder(wall_thickness * 2, connector_or, connector_or);
-			cylinder(wall_thickness, connector_or_b, connector_or_b);
+			sylinder(wall_thickness * 2, connector_or, connector_or);
+			sylinder(wall_thickness, connector_or_b, connector_or_b);
 		}
 }

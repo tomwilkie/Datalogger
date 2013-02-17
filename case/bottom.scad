@@ -11,6 +11,11 @@ cone_width = standoff_id + (2 * 2.25 * ((wall_thickness / 2) - 1.5) / 1.5);
 
 led_od = 5/2;
 
+connector_padding = ((external_depth - (4 * standoff_od) - (4 * connector_or_b)) / 3);
+echo(connector_padding);
+connector_1_y = (2 * standoff_od) + connector_padding + connector_or_b;
+connector_2_y = (2 * standoff_od) + connector_padding + (2*connector_or_b) + connector_padding + connector_or_b;
+
 module bottom() {
 	difference() {
 		// main box
@@ -32,11 +37,11 @@ module bottom() {
 			// substract pillars for lid from plug
 			for (i = lid_standoffs)
 				translate(i)			
-					cylinder(height, standoff_od, standoff_od);
+					sylinder(height, standoff_od, standoff_od);
 		}
 
 		// add a lip
-		translate([external_width/2,external_depth/2,height])
+		/*translate([external_width/2,external_depth/2,height])
 			difference() {
 				roundedBox([external_width + wall_thickness, 
 					external_depth + wall_thickness, 
@@ -45,7 +50,7 @@ module bottom() {
 					external_depth - wall_thickness,
 					wall_thickness * 2], outer_corner_radius 
 					- wall_thickness / 2, true);
-			}
+			}*/
 
 		// add standoffs holes for arduino
 		for (i = arduino_standoffs)
@@ -55,21 +60,22 @@ module bottom() {
 		for (i = arduino_standoffs)
 			standoff_nut(i);
 
+
 		// add holes for connectors
 		translate([external_width + wall_thickness - connector_depth_b,
-				wall_thickness + (internal_width / 4), height / 2])
+				connector_1_y, connector_or + 2 * wall_thickness + connector_padding])
 			connector_hole();
 		translate([external_width + wall_thickness - connector_depth_b,
-				wall_thickness + (internal_width / 2), height / 2])
+				connector_2_y, connector_or + 2 * wall_thickness + connector_padding])
 			connector_hole();
 		translate([external_width + wall_thickness - connector_depth_b,
-				wall_thickness + (3 * internal_width / 4), height / 2])
+				external_depth / 2, height - connector_or - wall_thickness - connector_padding])
 			connector_hole();
 
 		// add holes for lid standoffs
 		for (i = lid_standoffs)
 			translate([0, 0, - wall_thickness / 2] + i)			
-				cylinder(height + wall_thickness, standoff_id, standoff_id);
+				sylinder(height + wall_thickness, standoff_id, standoff_id);
 
 		// add a nut recess beneath the hole
 		for (i = lid_standoffs)
@@ -87,20 +93,20 @@ module bottom() {
 		translate([-wall_thickness/2, (external_width + pwr_switch_opening_width) / 2, 
 				 wall_thickness/2 + (height - pwr_switch_mounting_holes) / 2])
 			rotate([0,90,0])	union() {
-				cylinder(2 * wall_thickness, standoff_id, standoff_id);
-				cylinder(wall_thickness, cone_width, standoff_id);
+				sylinder(2 * wall_thickness, standoff_id, standoff_id);
+				sylinder(wall_thickness, cone_width, standoff_id);
 			}
 		translate([-wall_thickness/2, (external_width + pwr_switch_opening_width) / 2, 
 				 wall_thickness/2 + (height + pwr_switch_mounting_holes) / 2])
 			rotate([0,90,0])	union() {
-				cylinder(2 * wall_thickness, standoff_id, standoff_id);
-				cylinder(wall_thickness, cone_width, standoff_id);
+				sylinder(2 * wall_thickness, standoff_id, standoff_id);
+				sylinder(wall_thickness, cone_width, standoff_id);
 			}
 
 		// add a cutout for power/status led
 		translate([-wall_thickness/2, 3 * external_width / 8, (wall_thickness + height)/2])
 			rotate([0,90,0])
-				cylinder(2* wall_thickness, led_od, led_od);
+				sylinder(2* wall_thickness, led_od, led_od);
 	}
 }
 
